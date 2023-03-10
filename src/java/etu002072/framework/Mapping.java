@@ -22,11 +22,11 @@ public class Mapping {
     }
 
     public String getMethod() {
-        return Method;
+        return method;
     }
 
     public void setMethod(String Method) {
-        this.Method = Method;
+        this.method = Method;
     }
     
     
