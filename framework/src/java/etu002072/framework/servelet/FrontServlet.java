@@ -24,7 +24,8 @@ import java.util.List;
 import java.util.Map;
 import javax.servlet.RequestDispatcher;
 import etu002072.framework.utilitaire.DateEditor;
-
+import java.beans.PropertyEditor;
+import java.beans.PropertyEditorManager;
 import java.util.Date;
 
 /**
@@ -88,7 +89,27 @@ public class FrontServlet extends HttpServlet {
                     
                     Field [] fields = maClasse.getDeclaredFields();
 
-                  
+                    for(int i=0 ;i<fields.length;i++){
+                         if(request.getParameter(fields[i].getName())!=null){
+                             String setter = "set"+fields[i].getName().substring(0, 1).toUpperCase()+fields[i].getName().substring(1);
+                            // Object obj = request.getParameter(fields[i].getName());
+                             Class<?> fieldtype = fields[i].getType();
+                             PropertyEditor editor = PropertyEditorManager.findEditor(fieldtype);
+                             PropertyEditorManager.registerEditor(Date.class, DateEditor.class);
+                             editor.setAsText(request.getParameter(fields[i].getName()).trim());
+                             maClasse.getMethod(setter,fieldtype).invoke(instance,editor.getValue());
+                         }
+                    }
+                    
+                    
+                    
+                   for(int i=0 ;i<fields.length;i++){
+                         if(request.getParameter(fields[i].getName())!=null){
+                             String getter = "get"+fields[i].getName().substring(0, 1).toUpperCase()+fields[i].getName().substring(1);
+                             Object obj = request.getParameter(fields[i].getName());
+                             out.println(maClasse.getMethod(getter).invoke(instance));
+                         }
+                   }
                      if(maMethode.invoke(instance)!=null){
                         Object resultat = maMethode.invoke(instance);
                     // Traiter le résultat
