@@ -13,5 +13,13 @@
     </head>
     <body>
         <h1>AddEMp</h1>
+        <form method="post" action="emp-add"> 
+            Id:<input type="text" name="id"><br>
+            Nom:<input type="text" name="nom"><br>
+            Temps:<input type="text" name="temps"><br>
+            nb:<input type="text" name="nb"><br>
+            Date:<input type="date" name="date"><br>
+            <input type="submit" value="Valider">
+        </form>
     </body>
 </html>
