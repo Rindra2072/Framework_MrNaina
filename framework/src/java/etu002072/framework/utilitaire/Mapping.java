@@ -35,5 +35,4 @@ public class Mapping {
         this.method = Method;
     }
     
-    
 }

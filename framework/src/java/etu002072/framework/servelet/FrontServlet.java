@@ -18,13 +18,14 @@ import javax.servlet.http.HttpServletResponse;
 import etu002072.framework.utilitaire.AnnotationFinder;
 import etu002072.framework.utilitaire.Mapping;
 import etu002072.framework.utilitaire.ModelView;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 import javax.servlet.RequestDispatcher;
+import etu002072.framework.utilitaire.DateEditor;
 
-
-
+import java.util.Date;
 
 /**
  *
@@ -65,56 +66,60 @@ public class FrontServlet extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         PrintWriter out = response.getWriter();
-//        out.println("Servlet : FrontServlet");
-//        out.println("");
-//        out.println("Context Path :"+request.getContextPath());
-//        out.println("");
-//        out.println("URL :"+request.getRequestURL());
-//        out.println("");         
                String url=request.getRequestURI();
             String [] p  = url.split("/");
             String key=p[p.length-1];
              try {
                if(mappinUrls.containsKey(key)){
+
                    Mapping map = mappinUrls.get(key);
                    // out.println(map.getClassName());
-                   
+
                     // Charger la classe par son nom
                     Class<?> maClasse = Class.forName(map.getClassName());
 
                     // Créer une instance de la classe
+                   
                     Object instance = maClasse.newInstance();
-
+                                     
                     // Obtenir la méthode par son nom
                     Method maMethode = maClasse.getDeclaredMethod(map.getMethod());
-
                     // Appeler la méthode sur l'instance
-                    Object resultat = maMethode.invoke(instance);
-                   out.println(resultat.getClass());
-//                    out.println(ModelView.class);
+                    
+                    Field [] fields = maClasse.getDeclaredFields();
 
+                  
+                     if(maMethode.invoke(instance)!=null){
+                        Object resultat = maMethode.invoke(instance);
                     // Traiter le résultat
-                    if(resultat.getClass()==ModelView.class){
-                         ModelView mv = (ModelView) resultat;
-                         // Récupérer le dispatcher
-                      RequestDispatcher dispatcher = request.getRequestDispatcher(mv.getView());
-
+                    if(resultat.getClass() == ModelView.class){
+                           ModelView mv = (ModelView)resultat;        
+                             for (Map.Entry<String,Object> entry : mv.getData().entrySet()) {
+                                 request.setAttribute(entry.getKey(),entry.getValue());
+                             }
+                        RequestDispatcher dispatcher = request.getRequestDispatcher(mv.getView());
                         // Envoyer la demande au dispatcher
                         dispatcher.forward(request, response);
 
                     }
                     }
+                     else {
+                            out.println("Operation effectue");
+                     }
+                   
+                    }
                else { throw new Exception("No key "  + key + " in HashMap");}
                 } catch (Exception e) {
                     // Gérer les exceptions
-                    out.println(e.getMessage());
+                    
+                    out.println( " Il y a un e xception :"+e.getMessage());
                 }
                
                
            
        
     }
-
+  
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
      * Handles the HTTP <code>GET</code> method.
